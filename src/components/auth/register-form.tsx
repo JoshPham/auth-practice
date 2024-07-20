@@ -15,7 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { LoginSchema } from "@/schemas";
+import { RegisterSchema } from "@/schemas";
 import { Input } from "@/components/ui/input";
 
 import { CardWrapper } from "./card-wrapper";
@@ -24,22 +24,24 @@ import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import axios from "axios";
 
-export const LoginForm = () => {
+export const RegisterForm = () => {
   const [ errorMessage, setErrorMessage ] = useState<string | undefined>("");
   const [ successMessage, setSuccessMessage ] = useState<string | undefined>("");
   const [ isLoading, startTransition ] = useTransition();
 
-  const form = useForm<z.infer<typeof LoginSchema>>({
-    resolver: zodResolver(LoginSchema),
+  const form = useForm<z.infer<typeof RegisterSchema>>({
+    resolver: zodResolver(RegisterSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
+      // passwordConfirm: "",
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+  const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
     startTransition(async () => {
-      const res = await axios.post("/api/auth/login", values);
+      const res = await axios.post("/api/auth/register", values);
       setSuccessMessage(res.data?.success);
       setErrorMessage(res.data?.error);
     })
@@ -48,9 +50,9 @@ export const LoginForm = () => {
 
   return (
     <CardWrapper
-      headerLabel="Welcome back"
-      backButtonLabel="Don't have an account?"
-      backButtonHref="/auth/register"
+      headerLabel="Create an account"
+      backButtonLabel="Already have an account?"
+      backButtonHref="/auth/login"
       showSocial
     >
       <Form {...form}>
@@ -61,6 +63,23 @@ export const LoginForm = () => {
           className="space-y-6"
         >
           <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input 
+                      {...field}
+                      placeholder="Josh"
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"
@@ -97,13 +116,31 @@ export const LoginForm = () => {
                 </FormItem>
               )}
             />
+            {/* <FormField
+              control={form.control}
+              name="passwordConfirm"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input 
+                      {...field}
+                      placeholder="********"
+                      type="password"
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            /> */}
           </div>
           <Button
             type="submit"
             className="w-full"
             disabled={isLoading}
           >
-            Login
+            Register
           </Button>
         </form>
       </Form>
